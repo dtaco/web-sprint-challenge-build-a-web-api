@@ -48,6 +48,15 @@ router.delete('/:id', validProjectId, (req, res, next) => {
 
 })
 
+router.get('/:id/actions', validProjectId, async (req, res, next) => {
+    const actions = await Project.getProjectActions(req.params.id)
+    try {
+        res.json(actions)
+    } catch (err) {
+        next(err)
+    }
+})
+
 router.use((err, req, res, next) => { //eslint-disable-line
     res.status(err.status || 500).json({
         customMessage: 'something tragic inside projects router happened',
