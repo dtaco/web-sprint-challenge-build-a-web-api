@@ -30,6 +30,24 @@ router.post('/', validProjectInfo, async (req, res, next) => {
     }
 })
 
+router.put('/:id', validProjectId, validProjectInfo, async (req, res, next) => {
+    const updatedProj = await Project.update(req.params.id, req.body)
+    try {
+        res.status(200).json(updatedProj)
+    } catch (err) {
+        next(err)
+    }
+})
+
+router.delete('/:id', validProjectId, (req, res, next) => {
+    Project.remove(req.params.id)
+        .then(() => {
+            res.json()
+        })
+        .catch(next)
+
+})
+
 router.use((err, req, res, next) => { //eslint-disable-line
     res.status(err.status || 500).json({
         customMessage: 'something tragic inside projects router happened',
