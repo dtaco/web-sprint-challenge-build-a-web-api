@@ -1,20 +1,33 @@
 // Write your "projects" router here!
 const express = require('express');
 
-// const {
 
-// } = require('./projects-middleware');
-
-const Project = require('./projects-model')
+const Project = require('./projects-model');
+const { validProjectId, validProjectInfo, } = require('./projects-middleware');
+const { PromiseKind } = require('@sinclair/typebox');
 
 const router = express.Router();
 
-router.get('/api/projects', (req, res, next) => {
-    Project.get()
-        .then(projects => {
-            console.log(projects)
-        })
-        .catch(next)
+router.get('/', async (req,res, next) => {
+    const projects = await Project.get()
+    try {
+        res.status(200).json(projects)
+    } catch (error) {
+        next(error)
+    }
+});
+
+router.get('/:id', validProjectId, (req, res, next) => {
+    res.status(200).json(req.project);
+})
+
+router.post('/', validProjectInfo, async (req, res, next) => {
+    const newProj = await Project.insert(req.body)
+    try {
+        res.status(201).json(newProj)
+    } catch (err) {
+        next(err);
+    }
 })
 
 router.use((err, req, res, next) => { //eslint-disable-line
@@ -24,6 +37,8 @@ router.use((err, req, res, next) => { //eslint-disable-line
         stack: err.stack,
     })
 })
+
+
 
 
 module.exports = router
